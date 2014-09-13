@@ -89,7 +89,7 @@ for size in [130, 308]:
 
 	# This is for legacy reasons - we name all our files on the server using directories
 	# to work out what they are.
-	conn.upload("/".join([size_name, album.lower()]), f, s3_config["artwork_bucket"])
+	conn.upload("/".join([size_name, album.lower() + '.jpg']), f, s3_config["artwork_bucket"])
 	f.close()
 
 print "Uploading full size artwork."
