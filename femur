@@ -45,8 +45,6 @@ if any('FLAC' in item for item in files) != True:
 flac_dir = os.path.join(directory, 'FLAC')
 flacs = only_real_files(os.listdir(flac_dir))
 
-# TODO Check sanity and integrity of the directory and indeed all the other files.
-
 from mutagen.flac import FLAC
 
 audio = FLAC(os.path.join(flac_dir, flacs[0]))
