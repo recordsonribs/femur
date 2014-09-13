@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-import sys
-import os
+import sys, os
 import yaml
 
 def only_real_files(list):
@@ -11,6 +10,9 @@ def clean_format(format):
 
 def zip_file_name(artist, title, format):
 	return "-".join(["".join(word[0].lower() for word in artist.split()), title.lower(), clean_format(format).lower()]) + ".zip"
+
+def img_file_name(album, size):
+	return "-".join([album.lower(), (str(size) + 'x' + str(size))]) + '.jpg'
 
 def directory_name(artist, title, format):
 	if format.endswith('Vorbis'):
@@ -57,12 +59,49 @@ import zipfile
 import zlib
 import tinys3
 from progressbar import ProgressBar
+from PIL import Image
+
+# Image sizes.
+sizes = [130, 308]
+
+s3_config = config["s3"]
+conn = tinys3.Connection(s3_config["access_key"], s3_config["secret_key"], endpoint="s3-eu-west-1.amazonaws.com")
+
+artwork_location = os.path.join(directory, 'FLAC', 'Artwork.jpg')
+thumbnail_location = directory
+im = Image.open(artwork_location)
+
+print "Creating thumbnails"
+for size in [130, 308]:
+	i = im.resize((size, size), Image.ANTIALIAS)
+	image_file = img_file_name(album, size)
+	img_file_location = os.path.join(thumbnail_location, image_file)
+
+	i.save(img_file_location, "JPEG", quality=100)
+
+	print "Uploading image %s to S3." % image_file
+	f = open(img_file_location, 'rb')
+
+	if size == 130:
+		size_name = 'tiny'
+	else:
+		size_name = 'large'
+
+	# This is for legacy reasons - we name all our files on the server using directories
+	# to work out what they are.
+	conn.upload("/".join([size_name, album.lower()]), f, s3_config["artwork_bucket"])
+	f.close()
+
+print "Uploading full size artwork"
+f = open(artwork_location, 'rb')
+conn.upload("/".join(["huge", album.lower(), ".jpg"]), f, s3_config["artwork_bucket"])
+f.close()
+
+# Our Amazon buckets are in different region so :(
+conn = tinys3.Connection(s3_config["access_key"], s3_config["secret_key"])
 
 # Permitted directories output by Max
 extensions = ('FLAC', 'MP3', 'Vorbis')
-
-s3_config = config["s3"]
-conn = tinys3.Connection(s3_config["access_key"], s3_config["secret_key"])
 
 for d in files:
 	full_path = os.path.join(directory, d)
@@ -94,8 +133,10 @@ for d in files:
 		print "Uploading to S3, hold on this could take some time."
 		f = open(os.path.join(directory, zip_file), 'rb')
 		conn.upload(zip_file, f, s3_config["releases_bucket"])
-		print
-		
+		f.close()
+
+print "Uploading artwork"
+
 print "All done!"
 
 
