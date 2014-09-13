@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+import sys
+import os
+import yaml
+
+def only_real_files(list):
+	return [x for x in list if not x.startswith('.')]
+
+def clean_format(format):
+	return 'Ogg' if format.endswith('Vorbis') else format
+
+def zip_file_name(artist, title, format):
+	return "-".join(["".join(word[0].lower() for word in artist.split()), title.lower(), clean_format(format).lower()]) + ".zip"
+
+def directory_name(artist, title, format):
+	if format.endswith('Vorbis'):
+		format = 'Ogg'
+	return "%s - %s [%s]" % (artist, title, format)
+
+if len(sys.argv) < 2:
+	print "I need an argument."
+	sys.exit(1)
+
+if not os.path.isfile('./config.yaml'):
+	print "Please set up a config.yaml file in this directory."
+	sys.exit(1)
+
+directory = sys.argv[1]
+
+if os.path.isdir(directory) == False:
+	print "%s is not a directory." % directory
+	sys.exit(1)
+
+files = os.listdir(directory)
+
+if any('FLAC' in item for item in files) != True:
+	print "Couldn't find FLAC directory in %s" % directory
+	print "We need this to work some things out."
+	sys.exit(1)
+
+flac_dir = os.path.join(directory, 'FLAC')
+flacs = only_real_files(os.listdir(flac_dir))
+
+# TODO Check sanity and integrity of the directory and indeed all the other files.
+
+from mutagen.flac import FLAC
+
+audio = FLAC(os.path.join(flac_dir, flacs[0]))
+artist = unicode(audio["artist"][0])
+album = unicode(audio["album"][0])
+
+print "Reading %s - %s for release." % (artist, album)
+
+import zipfile
+import tinys3
+from progressbar import ProgressBar
+
+# Permitted directories output by Max
+extensions = ('FLAC', 'MP3', 'Vorbis')
+
+for d in files:
+	full_path = os.path.join(directory, d)
+
+	if not d.startswith('.') and os.path.isdir(full_path) and d.endswith(extensions):
+		new_name = directory_name(artist, album, d)
+		zip_name = zip_file_name(artist, album, d)
+
+		print "Renaming directory from %s to %s" % (d, new_name)
+		os.rename(full_path, os.path.join(directory, new_name))
+		full_path = os.path.join(directory, new_name)
+
+		print "Zipping %s into file named %s" % (new_name, zip_name)
+		zip = zipfile.ZipFile(os.path.join(directory, zip_name), 'w', zipfile.ZIP_DEFLATED)
+		audio_files = os.listdir(full_path)
+
+		pbar = ProgressBar(maxval=len(audio_files)).start()
+
+		i = 0
+		for f in audio_files:
+			if f.startswith('.'):
+				continue
+			zip.write(os.path.join(full_path, f), arcname=os.path.join(new_name, f))
+			pbar.update(i + 1)
+			i += 1
+		zip.close()
+		pbar.finish()
+
+
+
+		
+
+
+
+

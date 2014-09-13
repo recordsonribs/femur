@@ -1,0 +1,4 @@
+tinys3==0.1.11
+mutagen==1.24
+progressbar==2.2
+PyYAML==3.11
