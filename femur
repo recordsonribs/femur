@@ -25,6 +25,8 @@ if not os.path.isfile('./config.yaml'):
 	print "Please set up a config.yaml file in this directory."
 	sys.exit(1)
 
+config = yaml.load(open('./config.yaml', 'r'))
+
 directory = sys.argv[1]
 
 if os.path.isdir(directory) == False:
@@ -52,25 +54,29 @@ album = unicode(audio["album"][0])
 print "Reading %s - %s for release." % (artist, album)
 
 import zipfile
+import zlib
 import tinys3
 from progressbar import ProgressBar
 
 # Permitted directories output by Max
 extensions = ('FLAC', 'MP3', 'Vorbis')
 
+s3_config = config["s3"]
+conn = tinys3.Connection(s3_config["access_key"], s3_config["secret_key"])
+
 for d in files:
 	full_path = os.path.join(directory, d)
 
 	if not d.startswith('.') and os.path.isdir(full_path) and d.endswith(extensions):
 		new_name = directory_name(artist, album, d)
-		zip_name = zip_file_name(artist, album, d)
+		zip_file = zip_file_name(artist, album, d)
 
 		print "Renaming directory from %s to %s" % (d, new_name)
 		os.rename(full_path, os.path.join(directory, new_name))
 		full_path = os.path.join(directory, new_name)
 
-		print "Zipping %s into file named %s" % (new_name, zip_name)
-		zip = zipfile.ZipFile(os.path.join(directory, zip_name), 'w', zipfile.ZIP_DEFLATED)
+		print "Zipping %s into file named %s" % (new_name, zip_file)
+		zip = zipfile.ZipFile(os.path.join(directory, zip_file), 'w', zipfile.ZIP_DEFLATED)
 		audio_files = os.listdir(full_path)
 
 		pbar = ProgressBar(maxval=len(audio_files)).start()
@@ -85,6 +91,12 @@ for d in files:
 		zip.close()
 		pbar.finish()
 
+		print "Uploading to S3, hold on this could take some time."
+		f = open(os.path.join(directory, zip_file), 'rb')
+		conn.upload(zip_file, f, s3_config["releases_bucket"])
+		print
+		
+print "All done!"
 
 
 		
