@@ -71,7 +71,9 @@ artwork_location = os.path.join(directory, 'FLAC', 'Artwork.jpg')
 thumbnail_location = directory
 im = Image.open(artwork_location)
 
-print "Creating thumbnails"
+print "Uploading artwork."
+
+print "Creating thumbnails."
 for size in [130, 308]:
 	i = im.resize((size, size), Image.ANTIALIAS)
 	image_file = img_file_name(album, size)
@@ -92,7 +94,7 @@ for size in [130, 308]:
 	conn.upload("/".join([size_name, album.lower()]), f, s3_config["artwork_bucket"])
 	f.close()
 
-print "Uploading full size artwork"
+print "Uploading full size artwork."
 f = open(artwork_location, 'rb')
 conn.upload("/".join(["huge", album.lower(), ".jpg"]), f, s3_config["artwork_bucket"])
 f.close()
@@ -134,8 +136,6 @@ for d in files:
 		f = open(os.path.join(directory, zip_file), 'rb')
 		conn.upload(zip_file, f, s3_config["releases_bucket"])
 		f.close()
-
-print "Uploading artwork"
 
 print "All done!"
 
