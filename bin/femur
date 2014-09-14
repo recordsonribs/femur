@@ -16,7 +16,7 @@ def main():
 		print "Please set up a config.yaml file in this directory."
 		sys.exit(1)
 
-	config = yaml.load(open('./config.yaml', 'r'))
+	config = yaml.load(open('../config.yaml', 'r'))
 
 	sys.exit(1)
 
