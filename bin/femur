@@ -5,7 +5,7 @@ import yaml
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
-import femur.utils
+import femur.utils as utils
 
 def main():
 	if len(sys.argv) < 2:
@@ -35,7 +35,7 @@ def main():
 		sys.exit(1)
 
 	flac_dir = os.path.join(directory, 'FLAC')
-	flacs = only_real_files(os.listdir(flac_dir))
+	flacs = utils.only_real_files(os.listdir(flac_dir))
 
 	from mutagen.flac import FLAC
 
@@ -59,6 +59,11 @@ def main():
 
 	artwork_location = os.path.join(directory, 'FLAC', 'Artwork.jpg')
 	thumbnail_location = directory
+
+	if not os.path.exists(artwork_location):
+		print "Artwork not found, please place the artwork as JPEG at %s" % artwork_location
+		sys.exit(1)
+
 	im = Image.open(artwork_location)
 
 	print "Uploading artwork."
@@ -66,7 +71,7 @@ def main():
 	print "Creating thumbnails."
 	for size in [130, 308]:
 		i = im.resize((size, size), Image.ANTIALIAS)
-		image_file = img_file_name(album, size)
+		image_file = utils.img_file_name(album, size)
 		img_file_location = os.path.join(thumbnail_location, image_file)
 
 		i.save(img_file_location, "JPEG", quality=100)
@@ -99,8 +104,8 @@ def main():
 		full_path = os.path.join(directory, d)
 
 		if not d.startswith('.') and os.path.isdir(full_path) and d.endswith(extensions):
-			new_name = directory_name(artist, album, d)
-			zip_file = zip_file_name(artist, album, d)
+			new_name = utils.directory_name(artist, album, d)
+			zip_file = utils.zip_file_name(artist, album, d)
 
 			print "Renaming directory from %s to %s" % (d, new_name)
 			os.rename(full_path, os.path.join(directory, new_name))
