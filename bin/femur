@@ -9,7 +9,8 @@ import femur.utils
 
 def main():
 	if len(sys.argv) < 2:
-		print "I need an argument."
+		print "Usage:"
+		print "femur <directory to load audio files from>"
 		sys.exit(1)
 
 	if not os.path.isfile('./config.yaml'):
@@ -130,9 +131,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-		
-
-
-
-
