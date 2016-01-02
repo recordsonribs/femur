@@ -48,5 +48,9 @@ class TestZipFileName:
     def test_album_with_foreign_characters_is_handled(self):
         assert utils.zip_file_name('Normal Name', 'über', 'MP3') == 'normal-name-uber-mp3.zip'
 
-    def test_esoteric_ror_album_example(self):
+    def test_esoteric_records_on_ribs_album_examples(self):
         assert utils.zip_file_name('Blah', 'Going to Jib Choons (Choons for Going to Jib Like Innit)', 'MP3') == 'blah-gtjccfgtjli-mp3.zip'
+        assert utils.zip_file_name('Talk Less Say More', '\'It’s About Time\'', 'Flac') == 'tlsm-its-about-time-flac.zip'
+        assert utils.zip_file_name('Les Étoiles', 'To Leave A Mark', 'MP3') == 'les-etoiles-tlam-mp3.zip'
+        assert utils.zip_file_name('Ga’an', 'Ga’an', 'FLAC') == 'gaan-gaan-flac.zip'
+        assert utils.zip_file_name('All The Empires Of The World', 'CVRSVS', 'FLAC') == 'ateotw-cvrsvs-flac.zip'
