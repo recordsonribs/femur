@@ -1,5 +1,7 @@
 # coding=utf8
-from femur.utils import *
+from femur.utils import clean_format, strip_accents, zip_file_name, \
+    img_file_name, directory_name
+
 
 class TestCleanFormat:
 

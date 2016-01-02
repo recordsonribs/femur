@@ -5,6 +5,7 @@ import yaml
 
 import femur.utils as utils
 
+
 def main():
     if len(sys.argv) < 2:
         print "Usage:"
@@ -19,13 +20,13 @@ def main():
 
     directory = sys.argv[1]
 
-    if os.path.isdir(directory) == False:
+    if os.path.isdir(directory) is False:
         print "%s is not a directory." % directory
         sys.exit(1)
 
     files = os.listdir(directory)
 
-    if any('FLAC' in item for item in files) != True:
+    if any('FLAC' in item for item in files) is True:
         print "Couldn't find FLAC directory in %s" % directory
         print "We need this to work some things out."
         sys.exit(1)
@@ -42,22 +43,26 @@ def main():
     print "Reading %s - %s for release." % (artist, album)
 
     import zipfile
-    import zlib
     import tinys3
     from progressbar import ProgressBar
     from PIL import Image
 
     # Image sizes.
-    sizes = [130, 308]
+    # sizes = [130, 308]
 
     s3_config = config["s3"]
-    conn = tinys3.Connection(s3_config["access_key"], s3_config["secret_key"], endpoint="s3-eu-west-1.amazonaws.com")
+    conn = tinys3.Connection(
+        s3_config["access_key"],
+        s3_config["secret_key"],
+        endpoint="s3-eu-west-1.amazonaws.com"
+    )
 
     artwork_location = os.path.join(directory, 'FLAC', 'Artwork.jpg')
     thumbnail_location = directory
 
     if not os.path.exists(artwork_location):
-        print "Artwork not found, please place the artwork as JPEG at %s" % artwork_location
+        print "Artwork not found, please place the artwork as JPEG at %s"\
+            % artwork_location
         sys.exit(1)
 
     im = Image.open(artwork_location)
@@ -80,14 +85,23 @@ def main():
         else:
             size_name = 'large'
 
-        # This is for legacy reasons - we name all our files on the server using directories
-        # to work out what they are.
-        conn.upload("/".join([size_name, album.lower() + '.jpg']), f, s3_config["artwork_bucket"])
+        # This is for legacy reasons we name all our files on the server
+        # using directories to work out what they are.
+        conn.upload("/".join(
+            [size_name, album.lower() + '.jpg']),
+            f,
+            s3_config["artwork_bucket"]
+        )
         f.close()
 
     print "Uploading full size artwork."
     f = open(artwork_location, 'rb')
-    conn.upload("/".join(["huge", album.lower(), ".jpg"]), f, s3_config["artwork_bucket"])
+    conn.upload(
+        "/".join(["huge", album.lower(), ".jpg"]),
+        f,
+        s3_config["artwork_bucket"]
+    )
+
     f.close()
 
     # Our Amazon buckets are in different region so :(
@@ -99,7 +113,8 @@ def main():
     for d in files:
         full_path = os.path.join(directory, d)
 
-        if not d.startswith('.') and os.path.isdir(full_path) and d.endswith(extensions):
+        if not d.startswith('.') and os.path.isdir(full_path) \
+           and d.endswith(extensions):
             new_name = utils.directory_name(artist, album, d)
             zip_file = utils.zip_file_name(artist, album, d)
 
@@ -108,7 +123,11 @@ def main():
             full_path = os.path.join(directory, new_name)
 
             print "Zipping %s into file named %s" % (new_name, zip_file)
-            zip = zipfile.ZipFile(os.path.join(directory, zip_file), 'w', zipfile.ZIP_DEFLATED)
+            zip = zipfile.ZipFile(
+                os.path.join(directory, zip_file),
+                'w',
+                zipfile.ZIP_DEFLATED
+            )
             audio_files = os.listdir(full_path)
 
             pbar = ProgressBar(maxval=len(audio_files)).start()
@@ -117,7 +136,10 @@ def main():
             for f in audio_files:
                 if f.startswith('.'):
                     continue
-                zip.write(os.path.join(full_path, f), arcname=os.path.join(new_name, f))
+                zip.write(
+                    os.path.join(full_path, f),
+                    arcname=os.path.join(new_name, f)
+                )
                 pbar.update(i + 1)
                 i += 1
             zip.close()
