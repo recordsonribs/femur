@@ -8,6 +8,9 @@ This was built entirely with our own needs in mind - your milage may vary.
 
 `femur <directory you want to upload>`
 
+## Tests
+
+Using `pytest`, run as usual.
 
 ## Todo
 
