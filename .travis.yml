@@ -3,5 +3,5 @@ python:
   - 2.7.9
   - 3.5
 install:
-  - pip install -qe . --use-mirrors
+  - pip install -qe .
 script: py.test
