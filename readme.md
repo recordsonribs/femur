@@ -1,5 +1,7 @@
 # Femur
 
+[![Build Status](https://travis-ci.org/recordsonribs/femur.svg?branch=master)](https://travis-ci.org/recordsonribs/femur)
+
 Femur is a quick and (relatively) dirty Python script for uploading our releases to the various places they have to go on release.
 
 This was built entirely with our own needs in mind - your milage may vary.
