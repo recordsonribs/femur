@@ -47,9 +47,6 @@ def main():
     from progressbar import ProgressBar
     from PIL import Image
 
-    # Image sizes.
-    # sizes = [130, 308]
-
     s3_config = config["s3"]
     conn = tinys3.Connection(
         s3_config["access_key"],
