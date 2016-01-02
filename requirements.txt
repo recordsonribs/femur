@@ -4,3 +4,4 @@ progressbar==2.2
 PyYAML==3.11
 Pillow==2.5.3
 oursql==0.9.3.1
+pytest==2.8.5
