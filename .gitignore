@@ -1,3 +1,4 @@
 config.yaml
 *.pyc
 .cache
+femur.egg-info
