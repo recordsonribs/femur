@@ -1,11 +1,13 @@
 # coding=utf8
 from __future__ import absolute_import
 
+import unittest
+
 from femur.utils import (clean_format, strip_accents, zip_file_name,
                          img_file_name, directory_name)
 
 
-class TestCleanFormat:
+class TestCleanFormat(unittest.TestCase):
 
     def test_detects_vobris_and_removes(self):
         assert clean_format('Ogg Vorbis') == 'ogg'
@@ -14,14 +16,14 @@ class TestCleanFormat:
         assert clean_format('MP3') == 'mp3'
 
 
-class TestStripAccents:
+class TestStripAccents(unittest.TestCase):
 
     def test_strips_accents_we_might_find_a_problem(self):
         assert strip_accents('Les Étoiles über Mère Françoise noël') == \
             'Les Etoiles uber Mere Francoise noel'
 
 
-class TestZipFileName:
+class TestZipFileName(unittest.TestCase):
 
     def test_format_is_lowercased(self):
         assert zip_file_name('a', 'b', 'FLAC') == 'a-b-flac.zip'
@@ -84,7 +86,7 @@ class TestZipFileName:
             == 'ateotw-cvrsvs-flac.zip'
 
 
-class TestImageFileName:
+class TestImageFileName(unittest.TestCase):
 
     def test_image_file_removes_exotic_characters(self):
         assert img_file_name('This! Is! Éxotic!', 300) \
@@ -95,7 +97,7 @@ class TestImageFileName:
         assert img_file_name(title, 450) == 'rlanwalosgo-450x450.jpg'
 
 
-class TestDirectoryName:
+class TestDirectoryName(unittest.TestCase):
 
     def test_directory_name_is_correctly_formatted(self):
         assert directory_name('Les Étoiles', 'Album?!?!', 'Ogg') \
