@@ -23,7 +23,7 @@ def get_info_from_flacs(directory):
     flacs = only_real_files(os.listdir(flac_dir))
 
     audio = FLAC(os.path.join(flac_dir, flacs[0]))
-    return unicode(audio['artist'][0]), unicode(audio['album'][0])
+    return audio['artist'][0], audio['album'][0]
 
 
 class FLACReadError(Exception):
