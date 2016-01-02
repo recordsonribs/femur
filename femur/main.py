@@ -6,6 +6,7 @@ import os
 import yaml
 
 import femur.utils as utils
+import femur.parse as parse
 
 
 def main():
@@ -33,14 +34,7 @@ def main():
         print('We need this to work some things out.')
         sys.exit(1)
 
-    flac_dir = os.path.join(directory, 'FLAC')
-    flacs = utils.only_real_files(os.listdir(flac_dir))
-
-    from mutagen.flac import FLAC
-
-    audio = FLAC(os.path.join(flac_dir, flacs[0]))
-    artist = audio['artist'][0]
-    album = audio['album'][0]
+    artist, album = parse.get_info_from_flacs(directory)
 
     print('Reading %s - %s for release.'.format(artist, album))
 
