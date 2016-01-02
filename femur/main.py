@@ -1,4 +1,6 @@
 # coding=utf-8
+from __future__ import print_function
+
 import sys
 import os
 import yaml
@@ -8,12 +10,12 @@ import femur.utils as utils
 
 def main():
     if len(sys.argv) < 2:
-        print 'Usage:'
-        print 'femur <directory to load audio files from>'
+        print('Usage:')
+        print('femur <directory to load audio files from>')
         sys.exit(1)
 
     if not os.path.isfile('./config.yaml'):
-        print 'Please set up a config.yaml file in this directory.'
+        print('Please set up a config.yaml file in this directory.')
         sys.exit(1)
 
     config = yaml.load(open('config.yaml', 'r'))
@@ -21,14 +23,14 @@ def main():
     directory = sys.argv[1]
 
     if os.path.isdir(directory) is False:
-        print '%s is not a directory.' % directory
+        print('{} is not a directory.'.format(directory))
         sys.exit(1)
 
     files = os.listdir(directory)
 
     if any('FLAC' in item for item in files) is True:
-        print 'Couldn\'t find FLAC directory in %s' % directory
-        print 'We need this to work some things out.'
+        print('Couldn\'t find FLAC directory in {}'.format(directory))
+        print('We need this to work some things out.')
         sys.exit(1)
 
     flac_dir = os.path.join(directory, 'FLAC')
@@ -40,7 +42,7 @@ def main():
     artist = unicode(audio['artist'][0])
     album = unicode(audio['album'][0])
 
-    print 'Reading %s - %s for release.' % (artist, album)
+    print('Reading %s - %s for release.'.format(artist, album))
 
     import zipfile
     import tinys3
@@ -58,15 +60,15 @@ def main():
     thumbnail_location = directory
 
     if not os.path.exists(artwork_location):
-        print 'Artwork not found, please place the artwork as JPEG at %s'\
-            % artwork_location
+        print('Artwork not found, please place the artwork as JPEG at {}'
+              .format(artwork_location))
         sys.exit(1)
 
     im = Image.open(artwork_location)
 
-    print 'Uploading artwork.'
+    print('Uploading artwork.')
 
-    print 'Creating thumbnails.'
+    print('Creating thumbnails.')
     for size in [130, 308]:
         i = im.resize((size, size), Image.ANTIALIAS)
         image_file = utils.img_file_name(album, size)
@@ -74,7 +76,7 @@ def main():
 
         i.save(img_file_location, 'JPEG', quality=100)
 
-        print 'Uploading image %s to S3.' % image_file
+        print('Uploading image {} to S3.'.format(image_file))
         f = open(img_file_location, 'rb')
 
         if size == 130:
@@ -91,7 +93,7 @@ def main():
         )
         f.close()
 
-    print 'Uploading full size artwork.'
+    print('Uploading full size artwork.')
     f = open(artwork_location, 'rb')
     conn.upload(
         '/'.join(['huge', album.lower(), '.jpg']),
@@ -115,11 +117,11 @@ def main():
             new_name = utils.directory_name(artist, album, d)
             zip_file = utils.zip_file_name(artist, album, d)
 
-            print 'Renaming directory from %s to %s' % (d, new_name)
+            print('Renaming directory from %s to %s'.format(d, new_name))
             os.rename(full_path, os.path.join(directory, new_name))
             full_path = os.path.join(directory, new_name)
 
-            print 'Zipping %s into file named %s' % (new_name, zip_file)
+            print('Zipping %s into file named %s'.format(new_name, zip_file))
             zip = zipfile.ZipFile(
                 os.path.join(directory, zip_file),
                 'w',
@@ -142,12 +144,12 @@ def main():
             zip.close()
             pbar.finish()
 
-            print 'Uploading to S3, hold on this could take some time.'
+            print('Uploading to S3, hold on this could take some time.')
             f = open(os.path.join(directory, zip_file), 'rb')
             conn.upload(zip_file, f, s3_config['releases_bucket'])
             f.close()
 
-    print 'All done!'
+    print('All done!')
 
 if __name__ == '__main__':
     main()
