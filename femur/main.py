@@ -1,5 +1,5 @@
 # coding=utf-8
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import sys
 import os
@@ -39,8 +39,8 @@ def main():
     from mutagen.flac import FLAC
 
     audio = FLAC(os.path.join(flac_dir, flacs[0]))
-    artist = unicode(audio['artist'][0])
-    album = unicode(audio['album'][0])
+    artist = audio['artist'][0]
+    album = audio['album'][0]
 
     print('Reading %s - %s for release.'.format(artist, album))
 
