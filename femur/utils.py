@@ -8,7 +8,7 @@ def strip_accents(text):
         pass
     text = unicodedata.normalize('NFD', text)
     text = text.encode('ascii', 'ignore')
-    text = text.decode("utf-8")
+    text = text.decode('utf-8')
     return str(text)
 
 def only_real_files(list):
@@ -28,17 +28,21 @@ def truncate(string):
 def remove_special_characters(string):
 	return re.sub('[^A-Za-z0-9 \.]+', '', string)
 
-def clean_up_input(string):
+def clean_input(string):
 	string = strip_accents(string)
 	string = remove_special_characters(string)
 	string = truncate(string)
 	return string.lower()
 
 def zip_file_name(artist, title, format):
-	return '-'.join([clean_up_input(artist), clean_up_input(title), clean_format(format)]) + '.zip'
+	artist = clean_input(artist)
+	title = clean_input(title)
+	format = clean_format(format)
+	return '-'.join([artist, title, format]) + '.zip'
 
 def img_file_name(album, size):
-	return '-'.join([album.lower(), (str(size) + 'x' + str(size))]) + '.jpg'
+	album = clean_input(album)
+	return '-'.join([album, (str(size) + 'x' + str(size))]) + '.jpg'
 
 def directory_name(artist, title, format):
 	if format.endswith('Vorbis'):

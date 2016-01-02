@@ -54,3 +54,20 @@ class TestZipFileName:
         assert utils.zip_file_name('Les Étoiles', 'To Leave A Mark', 'MP3') == 'les-etoiles-tlam-mp3.zip'
         assert utils.zip_file_name('Ga’an', 'Ga’an', 'FLAC') == 'gaan-gaan-flac.zip'
         assert utils.zip_file_name('All The Empires Of The World', 'CVRSVS', 'FLAC') == 'ateotw-cvrsvs-flac.zip'
+
+class TestImageFileName:
+
+    def test_image_file_removes_exotic_characters(self):
+        assert utils.img_file_name('This! Is! Éxotic!', 300) == 'this-is-exotic-300x300.jpg'
+
+    def test_image_file_truncates_lengthy_album_names(self):
+        assert utils.img_file_name('really long album name with a lot of stuff going on', 450) == 'rlanwalosgo-450x450.jpg'
+
+
+class TestDirectoryName:
+
+    def test_directory_name_is_correctly_formatted(self):
+        assert utils.directory_name('Les Étoiles', 'Album?!?!', 'Ogg') == 'Les Étoiles - Album?!?! [Ogg]'
+
+    def test_directory_name_includes_very_long_names(self):
+        assert utils.directory_name('Strap The Button', 'Going to Jib Choons (Choons for Going to Jib Like Innit)', 'MP3') == 'Strap The Button - Going to Jib Choons (Choons for Going to Jib Like Innit) [MP3]'
