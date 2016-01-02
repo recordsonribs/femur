@@ -47,3 +47,6 @@ class TestZipFileName:
 
     def test_album_with_foreign_characters_is_handled(self):
         assert utils.zip_file_name('Normal Name', 'über', 'MP3') == 'normal-name-uber-mp3.zip'
+
+    def test_esoteric_ror_album_example(self):
+        assert utils.zip_file_name('Blah', 'Going to Jib Choons (Choons for Going to Jib Like Innit)', 'MP3') == 'blah-gtjccfgtjli-mp3.zip'
